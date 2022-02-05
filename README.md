@@ -1,6 +1,14 @@
-# SERVER REPO (for Node.js - API to PostgreSQL db)
+# SERVER REPO (Node.js -Express - REST API - PostgreSQL DB - Deployed on Heroku)
 
-This readme file contains the setup steps i followed to get this back end server working
+Where we are often now frequently studying remotely, we might still wish to study with someone else, either to share a research task, to try implementing a new technology, to do some pair programming on a joint code base, or maybe to study silently, but with other silent partners also present on a zoom call. The front end app (see repo here - TBC) allows you to browse existing study buddy requests, as well as letting you add your own request.
+
+This repo contains a 'proof of concept' server for the back end of the 'study buddy' app. It is written without using express-generator. It currently contains the scripts to set up and populate basic user and 'study request' table
+(The data model shows the tables for the MVP in green and tables for upcoming functionality, in white<br><br>
+![study-buddy-data-model](study-buddy-data-model.png)
+
+<br>The RESTful API currently contains basic routes to get all the study buddy requests, and to post a new request.
+
+This readme file contains the setup steps i followed from start to finish to get this server up and working with a couple of database tables, and a simple route.
 
 # PACKAGE INSTALLATIONS + package.json file edits
 
