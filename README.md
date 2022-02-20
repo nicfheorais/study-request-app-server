@@ -27,14 +27,14 @@ This readme file contains the setup steps i followed from start to finish to get
     $ npm init
     (for anyone cloning:  you will (probably?) need to re-do this)
 
-        package name: study-buddy
+        package name: studyrequest
         version : <<i left this as default, 1.0.0>>
-        description : gets all study buddy requests and posts new
+        description : gets all study requests and posts new requests
         entry point: <<i left this as default, index.js >>
         test command:
         git repository : <<i left this as default >>
         keywords:
-        author: George Rosanna Charlotte Sinead
+        author: <<enter names>>
         licence:
     ```
 
