@@ -4,7 +4,7 @@ Where we are often now frequently studying remotely, we might still wish to stud
 
 This repo contains a 'proof of concept' server for the back end of a 'study buddy' app. It is written without using express-generator. It currently contains the scripts to set up and populate basic user and 'study request' table
 (The data model shows the tables for the MVP in green and tables for upcoming functionality, in white<br><br>
-![study-buddy-data-model](study-buddy-data-model.png)
+![study-request-data-model](study-request-data-model.png)
 
 <br>The RESTful API currently contains basic routes to get all the study buddy requests, and to post a new request.
 
@@ -61,12 +61,19 @@ _Note: The additional packages that are installed in the School of Code example 
 
 ---
 
-    TODO: (if we want) to cover CORS issues, install cors:
-    ```
-        $ npm install cors
-    ```
-    and then later in the code ,, add a route, app.use(cors);
-    END OF TODO:
+(if we want) to cover CORS issues:
+
+-   install cors:
+
+```
+    $ npm install cors
+```
+
+-   and in the code, add a route:
+
+```
+   app.use(cors);
+```
 
 ---
 
@@ -79,11 +86,7 @@ _Note: The additional packages that are installed in the School of Code example 
     -   DONE - set up the script shortcuts _(remember to include "-r dotenv/config " for anything using db connection)_
 
         ```
-        "start": "node -r dotenv/config  ./bin/www.js",
-
-        "dbcreatestudyrequeststable": "node -r dotenv/config ./db/scripts/createStudyRequestsTable.js",
-
-        "dbpopulatestudyrequeststable": "node -r dotenv/config ./db/scripts/populateStudyRequestsTable.js",
+        "start": "node ./bin/www.js",
 
         "dev" : "nodemon -r dotenv/config  ./bin/www.js",
 
@@ -91,7 +94,9 @@ _Note: The additional packages that are installed in the School of Code example 
 
         ```
 
-        Note: previously we used to set "start" to use app.js, not bin/www.js. That was because in the earlier lectures, we had the app.listen() code in app.js along with the router code all in one file. Now we've progressed, and we've separated the app.listen code out into the www.js file
+        _Note: above, in package.json, if required, can later add script shortcuts for any db scripts to create, populate and drop tables._
+
+        _Note: previously we used to set "start" to use app.js, not bin/www.js. That was because, when we started, we had the app.listen() code inside app.js along with the router code all in one file. Now we've progressed, we've separated the app.listen code out into the www.js file_
 
 ---
 
@@ -100,7 +105,7 @@ _Note: The additional packages that are installed in the School of Code example 
 DONE - create folders, and EMPTY files:
 
 ```
-    DONE - server/
+    DONE - server/ - this is what i've called my root folder for this node.js app
 
     DONE - server/.env
 
@@ -108,11 +113,9 @@ DONE - create folders, and EMPTY files:
 
     DONE - server/.gitignore
 
-
     DONE - server/app.js      (NB: NOT auto-created)
 
-    (server/config.js NOT NEEDED, we think - see below for why)
-
+    (Note: server/config.js NOT ALWAYS NEEDED - create later if required)
 
     DONE - server/bin/        (NB: NOT auto-created)
 
@@ -121,24 +124,24 @@ DONE - create folders, and EMPTY files:
 
     DONE - server/db/
 
-    DONE - server/db/index.js   - [with the pool setup (and importing pg), and using the env variables via the db constants from config,js]
+    DONE - server/db/index.js   - [with the pool setup (and importing pg), and using the env variables, via the db constant(s)]
 
 
     DONE - server/db/scripts
 
 
-    DONE - server/db/scripts/dropBuddySearchTable.js
-    DONE - server/db/scripts/createBuddySearchTable.js
-    DONE - server/db/scripts/populateBuddySearchTable.js
+    DONE - server/db/scripts/dropXYZTable.js
+    DONE - server/db/scripts/createXYZTable.js
+    DONE - server/db/scripts/populateXYZTable.js
     *(Note: there will be a set of these for each table we need to set up)*
 
     DONE - server/models/
 
-    DONE - server/models/buddysearches.js    [for the SQL for 'getAllBuddySearches']
+    DONE - server/models/XYZ.js    [for the SQL for 'getAllXYZ etc']
 
 
     DONE - server/routes/
-           server/routes/buddysearches.js   [for the ROUTER for getAllBuddySearches, postBuddySearch etc]
+           server/routes/XYZ.js   [for the ROUTER for getAllXYZ, postXYZ etc]
 
 ```
 
@@ -152,14 +155,20 @@ Set up express, and the routes. Type the following into your app.js file:
 
 ```
     import express from "express";
+
+    // will also import our custom router aliases here
+
     const app = express();
 
     app.use(express.json());
+
+    //FYI potentially add CORS import and middleware here
+
+    // will also app.use our custom router aliases here
+
     export default app;
     // FYI the database PORT is now covered in bin/www.js
-
-    //TODO: will add the routes into here?
-
+    //FYI the routes are now in the ./routes folder
 ```
 
 ---
@@ -171,8 +180,8 @@ Set up the database PORT and the listener. Type the following into your app.js f
 ```
     import app from "../app.js";
 
-    const PORT = process.env.PORT || 5000;
-    // i.e. if there's a port for heroku, use that, otherwise go for local host
+    const LOCAL_PORT = 5000; //or wherever you wish to use
+    const PORT = process.env.PORT || LOCAL_PORT;
 
     app.listen(PORT, () => {
         console.log(`listening on PORT ${PORT}`);
@@ -188,8 +197,8 @@ Set up the PostgreSQL connection object. Type the following into your app.js fil
 
 ```
     import pg from "pg";
+
     const pool = new pg.Pool({
-        //set up connection string object
         connectionString : process.env.DATABASE_URL,
         max: 20,
         idleTimeoutMillis: 30000,
@@ -202,11 +211,9 @@ Set up the PostgreSQL connection object. Type the following into your app.js fil
     export default function query(text, params) {
         return pool.query(text, params);
     }
-
-    Note the DATABASE_URL has been taken from Heroku, and pasted into
-    the .env file, and the dotenv package copies them from there
-    into the process.env variable
 ```
+
+_Note the DATABASE_URL has been taken from Heroku, where the database has been created, and pasted into the .env file. The dotenv npm package copies anything from there into the equivalent process.env variable(s)_
 
 ---
 
